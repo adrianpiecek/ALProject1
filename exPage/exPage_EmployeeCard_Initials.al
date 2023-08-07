@@ -1,6 +1,5 @@
 pageextension 50103 EmployeeCardInitials extends "Employee Card"
 {
-
     layout
     {
         // Add changes to page layout here
@@ -8,12 +7,17 @@ pageextension 50103 EmployeeCardInitials extends "Employee Card"
         {
             trigger OnAfterValidate()
             var
-            //FirstLetter: Text;
-            begin
-                FirstLetterOfName := UpperCase(Rec."First Name".Substring(1, 1));
-                Message('%1', FirstLetterOfName);
 
-                //InitialsArray[1]:=
+            begin
+                if not (xRec."First Name" = Rec."First Name") then begin
+                    if Dialog.Confirm('Name has changed. Do you want to update No.?') then begin
+                        if rec."First Name" <> '' then begin
+                            FirstLetterOfName := UpperCase(Rec."First Name".Substring(1, 1));
+                        end;
+                    end;
+                end else begin
+                    FirstLetterOfName := UpperCase(Rec."First Name".Substring(1, 1));
+                end;
             end;
         }
         modify("Last Name")
@@ -22,14 +26,18 @@ pageextension 50103 EmployeeCardInitials extends "Employee Card"
             var
 
             begin
-                FirstLetterOfLastName := UpperCase(Rec."Last Name".Substring(1, 1));
-                Message('%1', FirstLetterOfLastName);
+                if not (xRec."Last Name" = Rec."Last Name") then begin
+                    if Confirm('Name has changed. Do you want to update No.?') then begin
+                        if rec."Last Name" <> '' then begin
+                            FirstLetterOfLastName := UpperCase(Rec."Last Name".Substring(1, 1));
+                        end;
+                    end;
+                end else begin
+                    FirstLetterOfLastName := UpperCase(Rec."Last Name".Substring(1, 1));
+                end;
             end;
         }
-        /*modify("No.")
-        {
-            
-        }*/
+
     }
 
     actions
@@ -38,38 +46,28 @@ pageextension 50103 EmployeeCardInitials extends "Employee Card"
 
     }
 
+
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     var
-
+        Employee: Record Employee;
     begin
+
         if (rec."First Name" = '') or (rec."Last Name" = '') then begin
             Message('First Name and Last Name must be filled');
             exit(false);
-        end;
-    end;
-
-    trigger OnClosePage()
-    var
-        myInt: Integer;
-    begin
-        /*for myInt := 1 to ArrayLen(InitialsArray) do begin
-            InitialsArray[myInt] := '';
-        end;*/
-        //InitialsArray[1] := Rec."First Name"/*.Substring(1, 1)*/;
-        //InitialsArray[2] := Rec."Last Name"/*.Substring(1, 1)*/;
-        if not Rec.FindLast() then begin
-            Rec.Rename(FirstLetterOfName + FirstLetterOfLastName + '1');// rec."No." := FirstLetterOfName + FirstLetterOfLastName + '1';
         end else begin
-
+            Employee.SetFilter("No.", FirstLetterOfName + FirstLetterOfLastName + '*');
+            if Employee.FindLast() then begin
+                rec.Rename(IncStr(Employee."No."));
+            end else begin
+                rec.Rename(FirstLetterOfName + FirstLetterOfLastName + '1');
+            end;
         end;
-        Message('%1', FirstLetterOfName + FirstLetterOfLastName);
-        Message('page closed');
-        //Rename(Employee."No.", InitialsArray[1] + InitialsArray[2]);
     end;
 
+
     var
-        InitialsArray: array[2] of Text;
         FirstLetterOfName: Text;
         FirstLetterOfLastName: Text;
-        Employee: Record Employee;
+
 }

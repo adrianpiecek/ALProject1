@@ -26,7 +26,11 @@ table 50104 Districts
             Caption = 'Signed Vechicle';
             TableRelation = Resource."No." where(Type = filter(= 'Transport'));
         }
-        //field(5;"Number of Received Packages";)
+        /*field(5; "Number of Received Packages";)
+        {
+            FieldClass = FlowField;
+            CalcFormula = lookup()
+        }*/
 
     }
 
