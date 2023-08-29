@@ -9,6 +9,10 @@ tableextension 50116 OrderNo extends "Sales & Receivables Setup"
             Caption = 'Transport Order Nos.';
             TableRelation = "No. Series";
         }
+        field(50119; "Realised Order Nos."; Code[20]){
+            Caption = 'Transport Order Nos.';
+            TableRelation="No. Series";
+        }
     }
 
 }
